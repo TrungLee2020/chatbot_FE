@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: #2d3748;
+    overscroll-behavior: none;
+}
+
+.chat-container {
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.message-ai, .message-user {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 36rem;
+}
+
+.message-ai .content, .message-user .content {
+    border-radius: 12px;
+    background: #f9fafb;
+    padding: 12px 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.message-ai:hover .content, .message-user:hover .content {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.message-user {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    space-x-reverse: 3;
+}
+
+.message-user .avatar {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9ca3af;
+    margin: 0 2px;
+    animation: bounce 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+.input-focus {
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.input-focus:focus {
+    outline: none;
+    border-color: #d1d5db;
+    box-shadow: 0 0 0 3px rgba(209,213,219,0.2);
+    background: #ffffff;
+}
+
+.reasoning-active {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+}
+
+.reasoning-active .fa-lightbulb {
+    color: #f59e0b !important;
+}
+
+.model-selector:hover .model-dropdown {
+    display: block;
+}
+
+/* CSS cho phần câu trả lời chính */
+.response-content {
+    line-height: 1.6;
+}
+
+.response-main {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.response-section {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.section-title {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.section-content p {
+    margin-bottom: 6px;
+}
+
+/* CSS cho phần nguồn tham khảo */
+.sources-container .sources-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.sources-container .sources-list:not(.hidden) {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.sources-container .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+.sources-container .fa-chevron-down.rotate-180 {
+    transform: rotate(180deg);
+}

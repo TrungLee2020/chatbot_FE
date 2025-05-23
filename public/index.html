@@ -1,0 +1,112 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+            var firstSheetName = workbook.SheetNames[0];
+            var worksheet = workbook.Sheets[firstSheetName];
+
+            // Convert sheet to JSON to filter blank rows
+            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+            // Filter out blank rows (rows where all cells are empty, null, or undefined)
+            var filteredData = jsonData.filter(row => row.some(filledCell));
+
+            // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+            var headerRowIndex = filteredData.findIndex((row, index) =>
+              row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+            );
+            // Fallback
+            if (headerRowIndex === -1 || headerRowIndex > 25) {
+              headerRowIndex = 0;
+            }
+
+            // Convert filtered JSON back to CSV
+            var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+            return csv;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    }
+    return gk_fileData[filename] || "";
+    }
+    </script><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mipo Chat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="flex flex-col h-screen bg-gradient-to-b from-gray-50 to-white">
+<!-- Tiêu đề với logo và tên -->
+<header class="bg-white py-4 px-6 flex items-center justify-center shadow-sm">
+    <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white shadow-md">
+            <i class="fas fa-robot text-base"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Mipo</h1>
+    </div>
+</header>
+
+<!-- Khu vực hiển thị tin nhắn -->
+<div class="chat-container flex-1 overflow-y-auto p-6 flex flex-col items-center">
+    <div class="message-ai flex items-start space-x-3 w-full max-w-xl">
+        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+            <i class="fas fa-robot text-sm"></i>
+        </div>
+        <div class="p-4 rounded-2xl w-full">
+            <p class="text-gray-700 text-base">Xin chào! Mình có thể giúp gì cho bạn hôm nay?</p>
+        </div>
+    </div>
+</div>
+
+<!-- Khu vực nhập tin nhắn -->
+<div class="bg-white border-t border-gray-100 p-4">
+    <div class="max-w-xl mx-auto">
+        <div class="relative flex items-center">
+            <textarea 
+                id="messageInput" 
+                class="w-full border border-gray-200 rounded-xl pl-4 pr-12 py-3 resize-none bg-white input-focus transition-all duration-300 shadow-md text-base" 
+                placeholder="Nhắn tin cho Mipo..." 
+                rows="2"
+                style="min-height: 60px; max-height: 150px;"
+            ></textarea>
+            <div class="absolute right-3 bottom-3 flex items-center space-x-2">
+                <button id="reasoningBtn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full w-8 h-8 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md">
+                    <i class="fas fa-lightbulb text-base"></i>
+                </button>
+                <div class="model-selector relative">
+                    <button id="modelBtn" class="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md">
+                        <span id="selectedModel">Mipo v1</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="modelDropdown" class="model-dropdown hidden absolute right-0 bottom-10 w-40 bg-white rounded-xl shadow-lg border border-gray-100 z-10">
+                        <div class="py-1">
+                            <a href="#" data-model="Mipo v1" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 transition-colors rounded-t-xl">Mipo v1</a>
+                            <a href="#" data-model="Mipo v2" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 transition-colors">Mipo v2</a>
+                            <a href="#" data-model="Mipo Pro" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-800 transition-colors rounded-b-xl">Mipo Pro</a>
+                        </div>
+                    </div>
+                </div>
+                <button id="sendBtn" class="text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fas fa-paper-plane text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b6b7842b51bffb',t:'MTc0NjUxNjA0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
